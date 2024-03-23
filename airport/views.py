@@ -1,6 +1,7 @@
 from rest_framework import mixins, viewsets
 
-from airport.models import Crew, AirplaneType, Airplane, Airport, Route
+from airport.flight_serializers import FlightSerializer
+from airport.models import Crew, AirplaneType, Airplane, Airport, Route, Flight
 from airport.serializers.airport_serializers import AirportSerializer
 from airport.serializers.crew_serializers import CrewSerializer
 from airport.serializers.airplane_type_serializers import (
@@ -55,3 +56,8 @@ class RouteViewSet(
 ):
     queryset = Route.objects.all()
     serializer_class = RouteSerializer
+
+
+class FlightViewSet(viewsets.ModelViewSet):
+    queryset = Flight.objects.all()
+    serializer_class = FlightSerializer
