@@ -2,7 +2,8 @@ from django.contrib.auth.base_user import BaseUserManager
 
 
 class UserManager(BaseUserManager):
-    """Define a custom manager for User model with email field instead of username"""
+    """Define a custom manager for User model
+    with email field instead of username"""
 
     use_in_migrations = True
 
