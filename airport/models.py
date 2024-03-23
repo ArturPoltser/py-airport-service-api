@@ -39,7 +39,7 @@ class Airplane(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"Airplane Name: {self.name}, Type: {self.airplane_type}"
+        return f"Airplane: {self.name}, Type: {self.airplane_type}"
 
 
 class Airport(models.Model):
@@ -63,6 +63,9 @@ class Route(models.Model):
     )
     distance = models.PositiveIntegerField()
 
+    class Meta:
+        unique_together = ("source", "destination")
+
     def __str__(self) -> str:
         return f"{self.source.name}-{self.destination.name}"
 
@@ -80,6 +83,7 @@ class Flight(models.Model):
     )
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
+    crew = models.ManyToManyField(Crew, related_name="flights")
 
     def __str__(self) -> str:
         return f"{self.route} - {self.airplane.name}"
