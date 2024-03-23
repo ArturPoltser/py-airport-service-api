@@ -1,13 +1,22 @@
 from rest_framework import mixins, viewsets
 
 from airport.flight_serializers import FlightSerializer
-from airport.models import Crew, AirplaneType, Airplane, Airport, Route, Flight
+from airport.models import (
+    Crew,
+    AirplaneType,
+    Airplane,
+    Airport,
+    Route,
+    Flight,
+    Order,
+)
 from airport.serializers.airport_serializers import AirportSerializer
 from airport.serializers.crew_serializers import CrewSerializer
 from airport.serializers.airplane_type_serializers import (
     AirplaneTypeSerializer
 )
 from airport.serializers.airplane_serializers import AirplaneSerializer
+from airport.serializers.order_serializers import OrderSerializer
 from airport.serializers.route_serializers import RouteSerializer
 
 
@@ -61,3 +70,15 @@ class RouteViewSet(
 class FlightViewSet(viewsets.ModelViewSet):
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
+
+
+class OrderViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
