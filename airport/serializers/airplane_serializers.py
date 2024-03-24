@@ -14,3 +14,9 @@ class AirplaneSerializer(serializers.ModelSerializer):
             "seats_in_row",
             "airplane_type",
         )
+
+
+class AirplaneDetailSerializer(AirplaneSerializer):
+    airplane_type = serializers.SlugRelatedField(
+        slug_field="name", read_only=True
+    )
