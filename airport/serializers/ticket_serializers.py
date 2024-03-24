@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
 from airport.models import Ticket
-from airport.serializers.flight_serializers import FlightListSerializer
+from airport.serializers.flight_serializers import FlightOrderSerializer
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -23,4 +23,4 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class TicketListSerializer(TicketSerializer):
-    flight = FlightListSerializer(many=False, read_only=True)
+    flight = FlightOrderSerializer(many=False, read_only=True)
