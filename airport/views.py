@@ -16,8 +16,14 @@ from airport.serializers.airplane_type_serializers import (
 from airport.serializers.airport_serializers import AirportSerializer
 from airport.serializers.crew_serializers import CrewSerializer
 from airport.serializers.flight_serializers import FlightSerializer
-from airport.serializers.order_serializers import OrderSerializer
-from airport.serializers.route_serializers import RouteSerializer
+from airport.serializers.order_serializers import (
+    OrderSerializer,
+)
+from airport.serializers.route_serializers import (
+    RouteSerializer,
+    RouteListSerializer,
+    RouteDetailSerializer
+)
 
 
 class CrewViewSet(
@@ -61,10 +67,33 @@ class AirportViewSet(
 class RouteViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
 ):
-    queryset = Route.objects.all()
+    queryset = Route.objects.select_related("source", "destination")
     serializer_class = RouteSerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+
+        if source := self.request.query_params.get("source"):
+            queryset = queryset.filter(source__name__icontains=source)
+
+        if destination := self.request.query_params.get("destination"):
+            queryset = queryset.filter(
+                destination__name__icontains=destination
+            )
+
+        return queryset.distinct()
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return RouteListSerializer
+
+        if self.action == "retrieve":
+            return RouteDetailSerializer
+
+        return RouteSerializer
 
 
 class FlightViewSet(viewsets.ModelViewSet):
