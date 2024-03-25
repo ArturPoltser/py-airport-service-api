@@ -1,6 +1,12 @@
 from datetime import datetime
 
 from django.db.models import F, Count
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import (
+    extend_schema_view,
+    extend_schema,
+    OpenApiParameter
+)
 from rest_framework import mixins, viewsets
 
 from airport.models import (
@@ -73,6 +79,22 @@ class AirportViewSet(
     serializer_class = AirportSerializer
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "source",
+                type=OpenApiTypes.STR,
+                description="Filtering by source (ex. ?source=Rome)"
+            ),
+            OpenApiParameter(
+                "destination",
+                type=OpenApiTypes.STR,
+                description="Filtering by destination (ex. ?destination=Paris)"
+            )
+        ]
+    )
+)
 class RouteViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
@@ -106,6 +128,34 @@ class RouteViewSet(
         return RouteSerializer
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "from",
+                type=OpenApiTypes.STR,
+                description="Filtering by source (ex. ?from=Rome)"
+            ),
+            OpenApiParameter(
+                "to",
+                type=OpenApiTypes.STR,
+                description="Filtering by destination (ex. ?to=Paris)"
+            ),
+            OpenApiParameter(
+                "departure_date",
+                type=OpenApiTypes.DATE,
+                description="Filtering by departure date "
+                            "(ex. ?departure_date=2024-03-25)"
+            ),
+            OpenApiParameter(
+                "arrival_date",
+                type=OpenApiTypes.DATE,
+                description="Filtering by arrival date "
+                            "(ex. ?arrival_date=2024-03-26)"
+            )
+        ]
+    )
+)
 class FlightViewSet(viewsets.ModelViewSet):
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
