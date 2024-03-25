@@ -12,6 +12,7 @@ from airport.models import (
     Flight,
     Order,
 )
+from airport.paginations import OrderPagination
 from airport.serializers.airplane_serializers import AirplaneSerializer
 from airport.serializers.airplane_type_serializers import (
     AirplaneTypeSerializer
@@ -185,6 +186,7 @@ class OrderViewSet(
         "tickets__flight__airplane"
     )
     serializer_class = OrderSerializer
+    pagination_class = OrderPagination
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
