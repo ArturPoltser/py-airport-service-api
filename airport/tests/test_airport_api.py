@@ -12,7 +12,10 @@ from airport.utils.samples import (
 )
 
 AIRPORT_URL = reverse("airport:airport-list")
-AIRPORT_DETAIL_URL = reverse("airport:airport-detail", kwargs={"pk": 1})
+
+
+def detail_url(airport_id):
+    return reverse("airport:airport-detail", args=[airport_id])
 
 
 class UnauthenticatedAirportApiTests(TestCase):
@@ -44,7 +47,7 @@ class AuthenticatedAirportTypeApiTests(TestCase):
         self.assertEqual(response.data.get("results"), serializer.data)
 
     def test_retrieve_airport_detail(self):
-        response = self.client.get(AIRPORT_DETAIL_URL)
+        response = self.client.get(detail_url(self.airport.id))
         serializer = AirportSerializer(self.airport)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -80,11 +83,11 @@ class AdminAirportApiTests(TestCase):
     def test_update_airport_not_allowed(self):
         data = {"closest_big_city": "Test"}
 
-        res = self.client.put(AIRPORT_DETAIL_URL, data)
+        res = self.client.put(detail_url(self.airport.id), data)
 
         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_delete_airport_not_allowed(self):
-        res = self.client.delete(AIRPORT_DETAIL_URL)
+        res = self.client.delete(detail_url(self.airport.id))
 
         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

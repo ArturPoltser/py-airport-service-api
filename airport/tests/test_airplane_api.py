@@ -14,7 +14,10 @@ from airport.utils.samples import (
 
 
 AIRPLANE_URL = reverse("airport:airplane-list")
-AIRPLANE_DETAIL_URL = reverse("airport:airplane-detail", kwargs={"pk": 1})
+
+
+def detail_url(airplane_id):
+    return reverse("airport:airplane-detail", args=[airplane_id])
 
 
 class UnauthenticatedAirplaneApiTests(TestCase):
@@ -46,7 +49,7 @@ class AuthenticatedAirplaneTypeApiTests(TestCase):
         self.assertEqual(response.data.get("results"), serializer.data)
 
     def test_retrieve_airplane_detail(self):
-        response = self.client.get(AIRPLANE_DETAIL_URL)
+        response = self.client.get(detail_url(self.airplane.id))
         serializer = AirplaneSerializer(self.airplane)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -65,7 +68,7 @@ class AuthenticatedAirplaneTypeApiTests(TestCase):
 
     def test_update_airplane_forbidden(self):
         payload = {"name": "Test Airplane22"}
-        response = self.client.patch(AIRPLANE_DETAIL_URL, payload)
+        response = self.client.patch(detail_url(self.airplane.id), payload)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -91,11 +94,11 @@ class AdminAirplaneApiTests(TestCase):
 
     def test_update_airplane(self):
         payload = {"name": "Test Airplane123"}
-        response = self.client.patch(AIRPLANE_DETAIL_URL, payload)
+        response = self.client.patch(detail_url(self.airplane.id), payload)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_delete_airplane_not_allowed(self):
-        res = self.client.delete(AIRPLANE_DETAIL_URL)
+        res = self.client.delete(detail_url(self.airplane.id))
 
         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

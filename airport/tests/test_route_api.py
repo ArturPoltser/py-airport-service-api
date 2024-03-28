@@ -16,7 +16,10 @@ from airport.utils.samples import (
 )
 
 ROUTE_URL = reverse("airport:route-list")
-ROUTE_DETAIL_URL = reverse("airport:route-detail", kwargs={"pk": 1})
+
+
+def detail_url(route_id):
+    return reverse("airport:route-detail", args=[route_id])
 
 
 class UnauthenticatedRouteApiTests(TestCase):
@@ -70,7 +73,7 @@ class AuthenticatedRouteTypeApiTests(TestCase):
         self.assertIn(serializer2.data, res.data.get("results"))
 
     def test_retrieve_route_detail(self):
-        response = self.client.get(ROUTE_DETAIL_URL)
+        response = self.client.get(detail_url(self.route.id))
         serializer = RouteDetailSerializer(self.route)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -123,11 +126,11 @@ class AdminRouteApiTests(TestCase):
     def test_update_route_not_allowed(self):
         data = {"distance": 20}
 
-        res = self.client.put(ROUTE_DETAIL_URL, data)
+        res = self.client.put(detail_url(self.route.id), data)
 
         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_delete_route_not_allowed(self):
-        res = self.client.delete(ROUTE_DETAIL_URL)
+        res = self.client.delete(detail_url(self.route.id))
 
         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
