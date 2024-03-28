@@ -1,4 +1,5 @@
 import datetime
+from operator import itemgetter
 
 from django.db.models import F, Count
 from django.test import TestCase
@@ -19,7 +20,10 @@ from airport.utils.samples import (
 )
 
 FLIGHT_URL = reverse("airport:flight-list")
-FLIGHT_DETAIL_URL = reverse("airport:flight-detail", kwargs={"pk": 1})
+
+
+def detail_url(flight_id):
+    return reverse("airport:flight-detail", args=[flight_id])
 
 
 class UnauthenticatedFlightApiTests(TestCase):
@@ -61,9 +65,10 @@ class AuthenticatedFlightTypeApiTests(TestCase):
     def test_list_flight(self):
         response = self.client.get(FLIGHT_URL)
         serializer = FlightListSerializer(self.flights, many=True)
+        serializer_data = sorted(serializer.data, key=itemgetter("id"))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get("results"), serializer.data)
+        self.assertEqual(response.data.get("results"), serializer_data)
 
     def test_filter_flights_by_from_city(self):
         response = self.client.get(FLIGHT_URL, {"from": "te"})
@@ -118,7 +123,7 @@ class AuthenticatedFlightTypeApiTests(TestCase):
         self.assertIn(serializer2.data, response.data.get("results"))
 
     def test_retrieve_flight_detail(self):
-        response = self.client.get(FLIGHT_DETAIL_URL)
+        response = self.client.get(detail_url(self.flight.id))
         serializer = FlightDetailSerializer(self.flight)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -133,12 +138,12 @@ class AuthenticatedFlightTypeApiTests(TestCase):
         payload = {
             "departure_time": datetime.datetime(2024, 4, 4, 14, 45),
         }
-        res = self.client.patch(FLIGHT_DETAIL_URL, payload)
+        res = self.client.patch(detail_url(self.flight.id), payload)
 
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_flight_forbidden(self):
-        res = self.client.delete(FLIGHT_DETAIL_URL)
+        res = self.client.delete(detail_url(self.flight.id))
 
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -185,11 +190,11 @@ class AdminFlightApiTests(TestCase):
             "arrival_time": datetime.datetime(2024, 4, 5, 14, 55)
         }
 
-        response = self.client.patch(FLIGHT_DETAIL_URL, payload)
+        response = self.client.patch(detail_url(self.flight.id), payload)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_delete_flight(self):
-        response = self.client.delete(FLIGHT_DETAIL_URL)
+        response = self.client.delete(detail_url(self.flight.id))
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
