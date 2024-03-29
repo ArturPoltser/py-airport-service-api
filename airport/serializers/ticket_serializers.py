@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from airport.models import Ticket
 from airport.serializers.flight_serializers import FlightOrderSerializer
@@ -20,6 +21,12 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ("id", "row", "seat", "flight")
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Ticket.objects.all(),
+                fields=("row", "seat", "flight")
+            )
+        ]
 
 
 class TicketListSerializer(TicketSerializer):
