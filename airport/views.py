@@ -15,7 +15,6 @@ from airport.models import (
     Order,
 )
 from airport.paginations import OrderPagination
-from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
 from airport.serializers.airplane_serializers import AirplaneSerializer
 from airport.serializers.airplane_type_serializers import (
     AirplaneTypeSerializer
@@ -46,7 +45,6 @@ class CrewViewSet(
 ):
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class AirplaneTypeViewSet(
@@ -56,7 +54,6 @@ class AirplaneTypeViewSet(
 ):
     queryset = AirplaneType.objects.all()
     serializer_class = AirplaneTypeSerializer
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class AirplaneViewSet(
@@ -68,7 +65,6 @@ class AirplaneViewSet(
 ):
     queryset = Airplane.objects.all()
     serializer_class = AirplaneSerializer
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class AirportViewSet(
@@ -79,7 +75,6 @@ class AirportViewSet(
 ):
     queryset = Airport.objects.all()
     serializer_class = AirportSerializer
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 @extend_schema_view(
@@ -93,7 +88,6 @@ class RouteViewSet(
 ):
     queryset = Route.objects.select_related("source", "destination")
     serializer_class = RouteSerializer
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
         queryset = self.queryset
@@ -116,7 +110,7 @@ class RouteViewSet(
         if self.action == "retrieve":
             return RouteDetailSerializer
 
-        return RouteSerializer
+        return self.serializer_class
 
 
 @extend_schema_view(
@@ -125,7 +119,6 @@ class RouteViewSet(
 class FlightViewSet(viewsets.ModelViewSet):
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -189,7 +182,7 @@ class FlightViewSet(viewsets.ModelViewSet):
         if self.action == "retrieve":
             return FlightDetailSerializer
 
-        return FlightSerializer
+        return self.serializer_class
 
 
 class OrderViewSet(
@@ -213,7 +206,7 @@ class OrderViewSet(
         if self.action == "list":
             return OrderListSerializer
 
-        return OrderSerializer
+        return self.serializer_class
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
