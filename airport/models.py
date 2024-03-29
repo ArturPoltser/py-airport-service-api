@@ -31,7 +31,6 @@ class AirplaneType(models.Model):
     name = models.CharField(max_length=63)
 
     class Meta:
-        verbose_name = "Airplane Type"
         verbose_name_plural = "Airplane Types"
 
     def __str__(self) -> str:
@@ -78,7 +77,12 @@ class Route(models.Model):
     distance = models.PositiveIntegerField()
 
     class Meta:
-        unique_together = ("source", "destination")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["source", "destination"],
+                name="unique_source_destination"
+            )
+        ]
 
     def __str__(self) -> str:
         return f"{self.source.name}-{self.destination.name}"
@@ -133,7 +137,12 @@ class Ticket(models.Model):
     )
 
     class Meta:
-        unique_together = ("flight", "row", "seat")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["flight", "row", "seat"],
+                name="unique_flight_row_seat"
+            )
+        ]
         ordering = ["row", "seat"]
 
     @staticmethod
