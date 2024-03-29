@@ -2,13 +2,22 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from airport.choises import CREW_POSITION_TYPE
-
 
 class Crew(models.Model):
+
+    class CrewPosition(models.TextChoices):
+        PILOT = "pilot", "Pilot"
+        COPILOT = "copilot", "Co-Pilot"
+        FLIGHT_ATTENDANT = "flight_attendant", "Flight Attendant"
+        OTHER = "other", "Other"
+
     first_name = models.CharField(max_length=63)
     last_name = models.CharField(max_length=63)
-    position = models.CharField(max_length=63, choices=CREW_POSITION_TYPE)
+    position = models.CharField(
+        max_length=20,
+        choices=CrewPosition,
+        default=CrewPosition.OTHER
+    )
 
     @property
     def full_name(self):
