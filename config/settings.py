@@ -145,6 +145,9 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": (
         "rest_framework.pagination.PageNumberPagination"
     ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "airport.permissions.IsAdminOrIfAuthenticatedReadOnly",
+    ),
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
